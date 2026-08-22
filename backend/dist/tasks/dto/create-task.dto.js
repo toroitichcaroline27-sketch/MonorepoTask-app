@@ -19,18 +19,18 @@ class CreateTaskDto {
 }
 exports.CreateTaskDto = CreateTaskDto;
 __decorate([
-    (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateTaskDto.prototype, "title", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateTaskDto.prototype, "description", void 0);
 __decorate([
-    (0, class_validator_1.IsEnum)(task_schema_1.TaskStatus),
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(task_schema_1.TaskStatus),
     __metadata("design:type", String)
 ], CreateTaskDto.prototype, "status", void 0);
 //# sourceMappingURL=create-task.dto.js.map

@@ -2,15 +2,15 @@ import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { TaskStatus } from '../schemas/task.schema';
 
 export class CreateTaskDto {
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   title: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   description?: string;
 
-  @IsEnum(TaskStatus)
   @IsOptional()
+  @IsEnum(TaskStatus)
   status?: TaskStatus;
 }
