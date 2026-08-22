@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'models/task_model.dart';
 import 'services/api_service.dart';
 
 void main() {
@@ -26,8 +27,8 @@ class TaskListScreen extends StatefulWidget {
 }
 
 class _TaskListScreenState extends State<TaskListScreen> {
-  List<dynamic> _allTasks = [];
-  List<dynamic> _filteredTasks = [];
+  List<Task> _allTasks = [];
+  List<Task> _filteredTasks = [];
   bool _isLoading = true;
 
   final _titleController = TextEditingController();
@@ -67,11 +68,19 @@ class _TaskListScreenState extends State<TaskListScreen> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredTasks = _allTasks.where((task) {
-        final title = (task['title'] ?? '').toString().toLowerCase();
-        final desc = (task['description'] ?? '').toString().toLowerCase();
-        return title.contains(query) || desc.contains(query);
+        return task.title.toLowerCase().contains(query) ||
+            task.description.toLowerCase().contains(query);
       }).toList();
     });
+  }
+
+  Future<void> _toggleTask(Task task) async {
+    try {
+      await ApiService.toggleTaskStatus(task.id, !task.isCompleted);
+      _fetchTasks();
+    } catch (e) {
+      _showSnackBar('Failed to update task status');
+    }
   }
 
   Future<void> _addTask() async {
@@ -148,15 +157,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
                     decoration: InputDecoration(
                       labelText: 'Search Tasks',
                       prefixIcon: const Icon(Icons.search),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                _searchController.clear();
-                                _filterTasks();
-                              },
-                            )
-                          : null,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -171,12 +171,22 @@ class _TaskListScreenState extends State<TaskListScreen> {
                           itemBuilder: (context, index) {
                             final task = _filteredTasks[index];
                             return ListTile(
-                              title: Text(task['title'] ?? 'No Title'),
-                              subtitle: Text(task['description'] ?? ''),
-                              leading: CircleAvatar(child: Text('${index + 1}')),
+                              leading: Checkbox(
+                                value: task.isCompleted,
+                                onChanged: (_) => _toggleTask(task),
+                              ),
+                              title: Text(
+                                task.title.isEmpty ? 'No Title' : task.title,
+                                style: TextStyle(
+                                  decoration: task.isCompleted
+                                      ? TextDecoration.lineThrough
+                                      : TextDecoration.none,
+                                ),
+                              ),
+                              subtitle: Text(task.description),
                               trailing: IconButton(
                                 icon: const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () => _deleteTask(task['_id']),
+                                onPressed: () => _deleteTask(task.id),
                               ),
                             );
                           },
